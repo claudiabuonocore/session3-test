@@ -31,13 +31,13 @@ Core Functional Requirements:
 Data Model (MVP):
 - Task object fields:
   - `id`: unique identifier (implementation detail—e.g., timestamp or UUID).
-  - `title`: string, required (non-empty after trim).
+  - `title`: string, required (non-empty). (No trimming rule assumed; behavior TBD.)
   - `completed`: boolean (default false).
   - `priority`: `"P1" | "P2" | "P3"` (default `"P3"`).
   - `dueDate`: optional string (ISO date). Invalid or empty input → omitted.
 
 Validation & Behavior Rules:
-- Trimming: `title` trimmed; if empty post-trim, reject task creation.
+- Title handling: exact handling of whitespace TBD; no trimming requirement assumed here.
 - Date parsing: accept only `YYYY-MM-DD` (length 10, numeric year/month/day, basic validity). If invalid → ignore.
 - Priority normalization: if not one of `P1|P2|P3`, set to `P3`.
 - Local storage key: `todos` (exact string) or equivalent documented constant.
@@ -45,9 +45,7 @@ Validation & Behavior Rules:
 - Today definition: `dueDate == today` (date-only compare) AND `completed == false`.
 
 Non-Functional (MVP):
-- Performance: Should handle at least 200 tasks without noticeable lag in filtering (basic array operations acceptable).
-- Accessibility: Basic semantic HTML; advanced keyboard nav explicitly deferred.
-- Browser Support: Modern Chromium-based browsers (codespace dev assumption).
+- No specific non-functional performance, accessibility, or browser support targets are declared at this time. (All such constraints TBD / not assumed.)
 
 Outcomes / Metrics (informal):
 - Manual QA confirms filters produce disjoint logical sets (Today ⊆ All, Overdue ⊆ All; Today and Overdue mutually exclusive).
@@ -80,15 +78,13 @@ Explicitly excluded from MVP & Post-MVP (for now):
 
 ## 5. Open Questions / Assumptions
 
-Assumptions:
-- Time zone = user’s local system; no UTC normalization required.
-- No soft-deletion; tasks are either present or manually removed (delete action TBD—not required for MVP).
-- Display format for dates can mirror input (no localization needed).
-- Sorting (within MVP) may remain “in insertion order” until Post-MVP sorting is implemented.
+Assumptions (minimized per request — only directly supported by artifacts):
+- Sorting changes are deferred to Post-MVP (as explicitly stated).
+- Storage remains local only (explicitly confirmed in artifacts).
 
 Potential Future Clarifications:
-- Max `title` length (recommend soft limit ~140 chars?).
-- Should completed tasks optionally hide in All via a toggle? (Not requested.)
+- Title length constraints (if any).
+- Whether completed tasks optionally hide in All via a toggle.
 - Whether to expose a “No due date” explicit badge for clarity.
 
 ---
