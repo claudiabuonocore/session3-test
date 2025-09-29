@@ -19,16 +19,17 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    priority TEXT NOT NULL DEFAULT 'P3',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )
 `);
 
 // Insert some initial data
 const initialItems = ['Item 1', 'Item 2', 'Item 3'];
-const insertStmt = db.prepare('INSERT INTO items (name) VALUES (?)');
+const insertStmt = db.prepare('INSERT INTO items (name, priority) VALUES (?, ?)');
 
 initialItems.forEach(item => {
-  insertStmt.run(item);
+  insertStmt.run(item, 'P3');
 });
 
 console.log('In-memory database initialized with sample data');
@@ -46,13 +47,13 @@ app.get('/api/items', (req, res) => {
 
 app.post('/api/items', (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, priority } = req.body;
     
     if (!name || typeof name !== 'string' || name.trim() === '') {
       return res.status(400).json({ error: 'Item name is required' });
     }
-    
-    const result = insertStmt.run(name);
+  const normalizedPriority = ['P1','P2','P3'].includes(priority) ? priority : 'P3';
+  const result = insertStmt.run(name, normalizedPriority);
     const id = result.lastInsertRowid;
     
     const newItem = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
@@ -60,6 +61,27 @@ app.post('/api/items', (req, res) => {
   } catch (error) {
     console.error('Error creating item:', error);
     res.status(500).json({ error: 'Failed to create item' });
+  }
+});
+
+// Update only priority for an existing item
+app.put('/api/items/:id/priority', (req, res) => {
+  try {
+    const { id } = req.params;
+    const { priority } = req.body;
+    if (!['P1','P2','P3'].includes(priority)) {
+      return res.status(400).json({ error: 'Invalid priority value' });
+    }
+    const update = db.prepare('UPDATE items SET priority = ? WHERE id = ?');
+    const info = update.run(priority, id);
+    if (info.changes === 0) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    const updated = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
+    res.json(updated);
+  } catch (error) {
+    console.error('Error updating priority:', error);
+    res.status(500).json({ error: 'Failed to update priority' });
   }
 });
 

@@ -31,6 +31,39 @@ section {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.priority-selector, .item-priority-buttons {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.priority-btn {
+  border: 1px solid #7A7A7A;
+  background: #7A7A7A;
+  color: #fff;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.priority-btn.selected {
+  background: #07F2E6;
+  border-color: #07F2E6;
+  color: #000;
+  font-weight: 600;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.item-name { flex: 1; }
+
 .add-item-section form {
   display: flex;
   gap: 10px;
